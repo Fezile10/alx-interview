@@ -1,59 +1,61 @@
-#!/usr/bin/python3
-"""N Queens"""
 import sys
 
+def is_safe(board, row, col, n):
+    # Check for another queen in the same column
+    for i in range(row):
+        if board[i] == col:
+            return False
+    
+    # Check for another queen in the upper left diagonal
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if i < row and board[i] == j:
+            return False
 
-def print_board(board, n):
-    """Print allocated positions to the queen"""
-    b = []
+    # Check for another queen in the upper right diagonal
+    for i, j in zip(range(row, -1, -1), range(col, n)):
+        if i < row and board[i] == j:
+            return False
 
-    for i in range(n):
-        for j in range(n):
-            if j == board[i]:
-                b.append([i, j])
-    print(b)
+    return True
 
-
-def is_position_safe(board, i, j, r):
-    """Checks if the position is safe for the queen"""
-    return board[i] in (j, j - i + r, i - r + j)
-
-
-def safe_positions(board, row, n):
-    """Find all safe positions where the queen can be allocated"""
+def solve_nqueens(n, row, board, solutions):
     if row == n:
-        print_board(board, n)
+        # Add a solution when all queens are placed
+        solutions.append([[i, board[i]] for i in range(n)])
+        return
+    
+    for col in range(n):
+        if is_safe(board, row, col, n):
+            board[row] = col  # Place a queen
+            solve_nqueens(n, row + 1, board, solutions)
+            board[row] = -1  # Backtrack
 
-    else:
-        for j in range(n):
-            allowed = True
-            for i in range(row):
-                if is_position_safe(board, i, j, row):
-                    allowed = False
-            if allowed:
-                board[row] = j
-                safe_positions(board, row + 1, n)
+def main():
+    # Validate command-line arguments
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
+    
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
 
+    # Initialize the board and solutions
+    board = [-1] * n
+    solutions = []
 
-def create_board(size):
-    """Generates the board"""
-    return [0 * size for i in range(size)]
+    # Solve the N-Queens problem
+    solve_nqueens(n, 0, board, solutions)
 
+    # Print solutions
+    for solution in solutions:
+        print(solution)
 
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    exit(1)
-
-try:
-    n = int(sys.argv[1])
-except BaseException:
-    print("N must be a number")
-    exit(1)
-
-if (n < 4):
-    print("N must be at least 4")
-    exit(1)
-
-board = create_board(int(n))
-row = 0
-safe_positions(board, row, int(n))
+if __name__ == "__main__":
+    main()
