@@ -1,3 +1,4 @@
+
 #!/usr/bin/python3
 """
 Define isWineer function, a solution to the Prime Game problem
